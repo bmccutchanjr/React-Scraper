@@ -1,51 +1,87 @@
-// This is the middleware that is responsible for interacting with the database.
+// This is the middleware responsible for interactiong with the database.
 
-const connection = require ("./connection");
+// require the dependencies
+const chalk = require("chalk");
+const db = require ("./schema");
 
 const database =
-{   addArticle: (headline, meta, image) =>
-    {   // Add an article to the database
+{   // This is a straight-up CRUD application.
 
-        // return a Promise (not a callback)
+    create: function(headline, nytDate, link, href, meta, img)
+    {   // Add a new record in the database.
+        //
+        // Articles are added to the database when the user clicks a button to save on of the articles
+        // scraped from the NY Times web site.
+
+        // I could use rest operator in the parameter list, but naming each of them makes their purpose more
+        // apparent
+
+console.log (chalk.blue("create: ", headline));
+        db.Article.create(
+        {   headline,
+            nytDate,
+            link,
+            href,
+            img,
+            meta
+        })
+console.log (chalk.blue("created"));
+    },
+
+    read: function(id)
+    {   // Get a single article from the database
 
         return new Promise ((resolve, reject) =>
-        {   query = "insert into Articles (headline, meta, image_url) values (?, ?, ?);";
-            connection.query (query, [headline, meta, image], function (error, results)
-            {   if (error) return reject (error);
-
-console.log (results.affectedRows)
-                if (results.affectedRows != 1) return reject ("An error occured inserting this article.  Is the headline unique?");
-
-                return resolve (results);
+        {   const data = db.Article.find({ _id: id })
+            .then(function(data)
+            {   resolve(data)
+            }) 
+            .catch(function(error)
+            {   reject(error)
             })
         })
     },
 
-    getAllHeadlines: () =>
-    {   // get all headlines from the database
+    readAll: function()
+    {   // Get all of the articles that have been saved to the database, sorted by the date the article
+        // was posted to the NY Times.
 
         return new Promise ((resolve, reject) =>
-        {   query = "select headline from Articles order by createdAt desc;";
-            connection.query (query, function (error, results)
-            {   if (error) return reject (error);
-
-                return resolve (results);
+        {
+            db.Article
+            .find()
+            .then(function(data)
+            {   
+                resolve(data)
+            })
+            .catch(function(error)
+            {   reject(error)
             })
         })
     },
 
-    getOneArticle: (id) =>
-    {   // get all of the data for one article
-    
-        return new Promise ((resolve, reject) =>
-        {   query = "select * from Articles where id = ?";
-            connection.query (query, [id], function (error, results)
-            {   if (error) return reject (error);
+    update: function()
+    {   // NOt sure I'm using this one with this application...
 
-                return resolve (results);
+    },
+
+    dalete: function(id)
+    {   // Delete an article from the database
+
+        return new Promise ((resolve, reject) =>
+        {
+            db.Article
+            .destroy({ id: id })
+            .then(function(data)
+            {   
+                resolve("all good")
+            })
+            .catch(function(error)
+            {   reject(error)
             })
         })
-    }
+    },
+
 }
 
 module.exports = database;
