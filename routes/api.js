@@ -1,21 +1,23 @@
 // This middleware implements the API routes for the application.  It is required by server.js and in
 // turn requires several other modules.
 
+const chalk = require("chalk");
 const express = require("express");
 const scrape = require ("./scrape");
-const database = require ("../data/database");
 
-const app = express ();
-const router = express.Router ();
-app.use ("/", router);
+const database = require ("../data/database");
 
 const apiRoutes = (io) =>
 {   // This is a little different than how I usually set up a routing module, but this module needs
     // a reference to 'io' which is in server.js.  To pass that reference, I need server.js to call a
     // function, which in turn will return a reference to router -- which is what server.js needs.
 
+    const app = express ();
+    const router = express.Router ();
+    app.use ("/", router);
+
     router
-    .use (function (request, result)
+    .use (function (request, result, next)
     {   // This always happens, no matter what route is requested.
 
         console.log(chalk.magenta("api.js: ", request.url))

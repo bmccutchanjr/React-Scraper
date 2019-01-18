@@ -9,6 +9,8 @@ const cheerio = require ("cheerio");
 
 const scrape = () =>
 {   
+
+console.log (chalk.blue("scraping"));
     return new Promise ((resolve, reject) =>
     {   // this is an asynchronous operation...use a Promise
 
@@ -51,3 +53,5 @@ const scrape = () =>
         })
     })
 }
+
+module.exports = scrape;
